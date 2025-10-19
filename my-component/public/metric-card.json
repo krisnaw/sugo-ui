@@ -1,0 +1,28 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "metric-card",
+  "type": "registry:ui",
+  "description": "A customizable metric display card with trend indicators and status variants for displaying KPIs, analytics data, and performance metrics.",
+  "categories": ["data-visualization", "metrics", "dashboard", "card"],
+  "dependencies": ["class-variance-authority", "lucide-react"],
+  "devDependencies": [],
+  "registryDependencies": ["card", "badge"],
+  "files": [
+    {
+      "path": "ui/metric-card.tsx",
+      "type": "registry:component",
+      "content": "'use client'\n\nimport * as React from 'react'\nimport { cva, type VariantProps } from 'class-variance-authority'\nimport { cn } from '@/lib/utils'\nimport { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'\nimport { Badge } from '@/components/ui/badge'\nimport { TrendingUp, TrendingDown, Minus } from 'lucide-react'\n\ninterface MetricCardProps extends React.HTMLAttributes<HTMLDivElement> {\n  title: string\n  description?: string\n  value: string | number\n  change?: {\n    value: number\n    period: string\n    trend: 'up' | 'down' | 'neutral'\n  }\n  variant?: 'default' | 'compact' | 'detailed'\n  status?: 'success' | 'warning' | 'error' | 'info' | 'neutral'\n}\n\nconst metricCardVariants = cva(\n  'transition-all duration-200',\n  {\n    variants: {\n      variant: {\n        default: 'p-6',\n        compact: 'p-4',\n        detailed: 'p-6 space-y-4',\n      },\n      status: {\n        success: 'border-green-200 bg-green-50/50 dark:border-green-800 dark:bg-green-950/50',\n        warning: 'border-yellow-200 bg-yellow-50/50 dark:border-yellow-800 dark:bg-yellow-950/50',\n        error: 'border-red-200 bg-red-50/50 dark:border-red-800 dark:bg-red-950/50',\n        info: 'border-blue-200 bg-blue-50/50 dark:border-blue-800 dark:bg-blue-950/50',\n        neutral: '',\n      },\n    },\n    defaultVariants: {\n      variant: 'default',\n      status: 'neutral',\n    },\n  }\n)\n\n// Helper function to format numeric values with locale-aware formatting\nconst formatValue = (val: string | number) => {\n  if (typeof val === 'number') {\n    return new Intl.NumberFormat().format(val)\n  }\n  return val\n}\n\n// Helper function to get appropriate trend icon\nconst getTrendIcon = (trend: 'up' | 'down' | 'neutral') => {\n  switch (trend) {\n    case 'up':\n      return <TrendingUp className=\"h-4 w-4 text-green-600 dark:text-green-400\" />\n    case 'down':\n      return <TrendingDown className=\"h-4 w-4 text-red-600 dark:text-red-400\" />\n    case 'neutral':\n      return <Minus className=\"h-4 w-4 text-muted-foreground\" />\n  }\n}\n\n// Helper function to get trend-appropriate text colors\nconst getTrendColor = (trend: 'up' | 'down' | 'neutral') => {\n  switch (trend) {\n    case 'up':\n      return 'text-green-600 dark:text-green-400'\n    case 'down':\n      return 'text-red-600 dark:text-red-400'\n    case 'neutral':\n      return 'text-muted-foreground'\n  }\n}\n\nfunction MetricCard({ \n  title, \n  description, \n  value, \n  change, \n  variant = 'default',\n  status = 'neutral',\n  className,\n  ...props \n}: MetricCardProps) {\n  return (\n    <Card\n      className={cn(metricCardVariants({ variant, status }), className)}\n      {...props}\n    >\n      <CardHeader className={cn(\n        'flex flex-row items-center justify-between space-y-0',\n        variant === 'compact' && 'pb-2'\n      )}>\n        <div className=\"space-y-1\">\n          <CardTitle className={cn(\n            variant === 'compact' ? 'text-sm' : 'text-base'\n          )}>\n            {title}\n          </CardTitle>\n          {description && (\n            <CardDescription className={cn(\n              variant === 'compact' && 'text-xs'\n            )}>\n              {description}\n            </CardDescription>\n          )}\n        </div>\n      </CardHeader>\n      \n      <CardContent className={cn(\n        variant === 'compact' && 'pt-0'\n      )}>\n        <div className=\"flex items-baseline gap-2\">\n          <div className={cn(\n            'font-bold',\n            variant === 'compact' ? 'text-xl' : 'text-2xl lg:text-3xl'\n          )}>\n            {formatValue(value)}\n          </div>\n          \n          {change && (\n            <div className={cn(\n              'flex items-center gap-1 text-sm',\n              getTrendColor(change.trend)\n            )}>\n              {getTrendIcon(change.trend)}\n              <span className=\"font-medium\">\n                {Math.abs(change.value)}%\n              </span>\n              <span className=\"text-muted-foreground\">\n                {change.period}\n              </span>\n            </div>\n          )}\n        </div>\n      </CardContent>\n    </Card>\n  )\n}\n\nMetricCard.displayName = 'MetricCard'\n\nexport { MetricCard, type MetricCardProps }"
+    }
+  ],
+  "tailwind": {
+    "config": {
+      "theme": {
+        "extend": {}
+      }
+    }
+  },
+  "cssVars": {
+    "light": {},
+    "dark": {}
+  }
+}
